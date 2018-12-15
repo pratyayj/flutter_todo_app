@@ -16,31 +16,28 @@ class _ListGeneratorState extends State<ListGenerator> {
 
   Widget build(BuildContext context) {
 
-    Widget _buildTodoItemRow(Task task) {
-      return ListTile(
-        title: Text(
-            task.getTask(),
-            style: _biggerFont
-        ),
-        trailing: new Icon(
-            Icons.delete,
-            color: Colors.grey
-        ),
-      );
-    }
-
     Widget _buildTodoList() {
-      return ListView.builder(
+      return ListView.separated(
           itemCount: widget.todoList == null ? 0 : widget.todoList.length,
+          separatorBuilder: (BuildContext, int index) => Divider(),
           shrinkWrap: true,
           padding: const EdgeInsets.all(32.0),
           itemBuilder: (context, i) {
-            if (i.isOdd) return Divider();
-            final index = i ~/ 2;
-            return _buildTodoItemRow(widget.todoList[index]);
+            return ListTile(
+              title: Text(
+                  widget.todoList[i].getTask(),
+                  style: _biggerFont
+              ),
+              trailing: new Icon(
+                  Icons.delete,
+                  color: Colors.grey
+              ),
+            );
           }
       );
     }
+
+    return _buildTodoList();
   }
 
 }
