@@ -71,7 +71,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
                     }
 
                     // By default, show a loading spinner
-                    return CircularProgressIndicator();
+                    return Center(child: CircularProgressIndicator());
                   }
                 )
                 //titleSection,
