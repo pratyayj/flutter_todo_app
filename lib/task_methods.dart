@@ -18,7 +18,8 @@ Future<List<Task>> fetchTask() async {
 }
 
 List<Task> parseData(String response) {
-  final parsed = json.decode(response).cast<Map<dynamic, dynamic>>();
-  //print(parsed['data']);
-  return parsed["data"].map<Task>((json) => new Task.fromJson(json)).toList();
+  final parsed = json.decode(response);
+
+  return (parsed["data"] as List).map<Task>((json) =>
+  new Task.fromJson(json)).toList();
 }
