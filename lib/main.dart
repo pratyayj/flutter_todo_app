@@ -38,7 +38,7 @@ class TodoHomePage extends StatefulWidget {
 }
 
 class _TodoHomePageState extends State<TodoHomePage> {
-  final _todoList = <Task>[];
+  List _todoList = new List<Task>();
   final _biggerFont = const TextStyle(fontSize: 18.0);
 
   String post_url =
@@ -46,7 +46,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
 
   final myController = TextEditingController();
 
-  Future<String> apiRequest(String url, Map jsonMap) async {
+  Future<String> apiCreateRequest(String url, Map jsonMap) async {
     HttpClient httpClient = new HttpClient();
     HttpClientRequest request = await httpClient.postUrl(Uri.parse(url));
     request.headers.set('content-type', 'application/json');
@@ -65,10 +65,75 @@ class _TodoHomePageState extends State<TodoHomePage> {
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+  }
+
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       new GlobalKey<RefreshIndicatorState>();
 
-  Future<Null> refreshList() {}
+  Future<Null> refreshList() async {
+    await Future.delayed(Duration(seconds: 1));
+    return fetchTask().then((_tasks) {
+      setState(() => _todoList = _tasks);
+
+    });
+  }
+
+  createList(List<Task> todoList) {
+    final _biggerFont = const TextStyle(fontSize: 18.0);
+
+    String delete_url =
+        'http://prattodo.us-east-2.elasticbeanstalk.com/api/delete/';
+
+    Future<String> apiDeleteRequest(String url) async {
+      HttpClient httpClient = new HttpClient();
+      HttpClientRequest request = await httpClient.deleteUrl(Uri.parse(url));
+      HttpClientResponse response = await request.close();
+      // todo - you should check the response.statusCode
+      String reply = await response.transform(utf8.decoder).join();
+      httpClient.close();
+      print(reply);
+      return reply;
+    }
+
+    Widget _buildTodoList() {
+      return ListView.separated(
+          physics: const ScrollPhysics(),
+          itemCount: todoList == null ? 0 : todoList.length,
+          separatorBuilder: (BuildContext, int index) => Divider(),
+          shrinkWrap: true,
+          padding: const EdgeInsets.fromLTRB(32.0, 32.0, 32.0, 0.0),
+          itemBuilder: (context, i) {
+            return ListTile(
+              title: Text(
+                  todoList[i].getTask(),
+                  style: _biggerFont
+              ),
+              trailing: GestureDetector(
+                onTap: () {
+                  String name = todoList[i].getId();
+                  Scaffold.of(context).showSnackBar(new SnackBar(
+                      content: Text("You want to delete this " + name)));
+                  String final_delete_url = delete_url + name;
+                  apiDeleteRequest(final_delete_url);
+                  refreshList();
+                },
+                child: new Icon(
+                  Icons.delete,
+                  color: Colors.grey,
+
+                ),
+              ),
+            );
+          }
+      );
+    }
+
+    return _buildTodoList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,19 +155,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
                       height: 240.0,
                       fit: BoxFit.cover,
                     ),
-                    new FutureBuilder<List<Task>>(
-                        future: fetchTask(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            print("Data is present");
-                            return new ListGenerator(todoList: snapshot.data);
-                          } else if (snapshot.hasError) {
-                            return Text("${snapshot.error}");
-                          }
-
-                          // By default, show a loading spinner
-                          return Center(child: CircularProgressIndicator());
-                        }),
+                    buildListViewWidget(),
                     Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
@@ -130,26 +183,31 @@ class _TodoHomePageState extends State<TodoHomePage> {
                                   myController.clear();
                                   Map map = {'task': temp};
                                   // add logging message or display HTTP response
-                                  apiRequest(post_url, map);
+                                  apiCreateRequest(post_url, map);
                                 },
-                                /*
-                  onPressed: () {
-                    return showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        content: Text(myController.text),
-                      );
-                    },
-                    );
-                  }, */
-                                // splashColor: Colors.blueGrey,
                               ))
                         ]),
-
-                    //titleSection,
-                    //ClickHereWidget(),
                   ],
-                ))));
+                )
+            )
+        )
+    );
+  }
+
+  FutureBuilder<List<Task>> buildListViewWidget() {
+    return new FutureBuilder<List<Task>>(
+        future: fetchTask(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            print("Data is present");
+            _todoList = snapshot.data;
+            return createList(_todoList);
+          } else if (snapshot.hasError) {
+            return Text("${snapshot.error}");
+          }
+
+          return Container(width: 0.0, height: 0.0);
+
+        });
   }
 }

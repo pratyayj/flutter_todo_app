@@ -16,4 +16,8 @@ class Task {
   String getTask() {
     return task;
   }
+
+  String getId() {
+    return id;
+  }
 }
