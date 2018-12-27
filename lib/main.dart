@@ -114,12 +114,13 @@ class _TodoHomePageState extends State<TodoHomePage> {
               ),
               trailing: GestureDetector(
                 onTap: () {
-                  String name = todoList[i].getId();
+                  String name = todoList[i].getTask();
                   Scaffold.of(context).showSnackBar(new SnackBar(
-                      content: Text("You want to delete this " + name)));
+                      content: Text("You have successfully deleted the todo: " + name)));
                   String final_delete_url = delete_url + name;
                   apiDeleteRequest(final_delete_url);
                   refreshList();
+                  _refreshIndicatorKey.currentState.show();
                 },
                 child: new Icon(
                   Icons.delete,
