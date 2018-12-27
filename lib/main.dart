@@ -141,6 +141,37 @@ class _TodoHomePageState extends State<TodoHomePage> {
     return MaterialApp(
         title: 'learning',
         home: Scaffold(
+          bottomNavigationBar: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Flexible(
+                    child: Padding(
+                        padding: const EdgeInsets.fromLTRB(
+                            32.0, 16.0, 0.0, 16.0),
+                        child: TextField(
+                          controller: myController,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'Please enter a todo task',
+                          ),
+                        ))),
+                Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                        0.0, 16.0, 32.0, 16.0),
+                    child: RaisedButton(
+                      child: const Text('Submit'),
+                      color: Colors.red,
+                      highlightColor: Colors.blue,
+                      elevation: 4.0,
+                      onPressed: () {
+                        String temp = myController.text;
+                        myController.clear();
+                        Map map = {'task': temp};
+                        // add logging message or display HTTP response
+                        apiCreateRequest(post_url, map);
+                      },
+                    ))
+              ]),
             appBar: AppBar(
               title: Text('Pratyay\'s Todo list'),
             ),
@@ -156,38 +187,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
                       fit: BoxFit.cover,
                     ),
                     buildListViewWidget(),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Flexible(
-                              child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                      32.0, 0.0, 0.0, 16.0),
-                                  child: TextField(
-                                    controller: myController,
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: 'Please enter a todo task',
-                                    ),
-                                  ))),
-                          Padding(
-                              padding: const EdgeInsets.fromLTRB(
-                                  0.0, 0.0, 32.0, 16.0),
-                              child: RaisedButton(
-                                child: const Text('Submit'),
-                                color: Colors.red,
-                                highlightColor: Colors.blue,
-                                elevation: 4.0,
-                                onPressed: () {
-                                  String temp = myController.text;
-                                  myController.clear();
-                                  Map map = {'task': temp};
-                                  // add logging message or display HTTP response
-                                  apiCreateRequest(post_url, map);
-                                },
-                              ))
-                        ]),
-                  ],
+                    ],
                 )
             )
         )
