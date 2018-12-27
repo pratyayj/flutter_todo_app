@@ -18,6 +18,7 @@ class _ListGeneratorState extends State<ListGenerator> {
 
     Widget _buildTodoList() {
       return ListView.separated(
+          physics: const ScrollPhysics(),
           itemCount: widget.todoList == null ? 0 : widget.todoList.length,
           separatorBuilder: (BuildContext, int index) => Divider(),
           shrinkWrap: true,
@@ -41,3 +42,7 @@ class _ListGeneratorState extends State<ListGenerator> {
   }
 
 }
+
+/*
+
+ */
