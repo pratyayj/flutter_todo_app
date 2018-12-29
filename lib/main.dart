@@ -170,8 +170,8 @@ class _TodoHomePageState extends State<TodoHomePage> {
         title: 'learning',
         home: Scaffold(
           key: _scaffoldKey,
-            bottomSheet: _buildTodoCreatorForm(),
-            // bottomNavigationBar: _buildTodoCreatorForm(),
+            // bottomSheet: _buildTodoCreatorForm(),
+            bottomNavigationBar: _buildTodoCreatorForm(),
             appBar: AppBar(
               title: Text('Pratyay\'s Todo list'),
             ),
