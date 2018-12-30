@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'task.dart';
 import 'api_methods.dart';
 import 'task_methods.dart';
+import 'todos_by_tags.dart';
 
 void main() => runApp(MyApp());
 
@@ -44,7 +45,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
 
   /// The DELETE url for deleting Todos
   final String DELETE_URL =
-      'http://prattodo.us-east-2.elasticbeanstalk.com/api/delete/';
+      'http://prattodo.us-east-2.elasticbeanstalk.com/api/deleteTodo/';
 
   @override
   void initState() {
@@ -171,6 +172,22 @@ class _TodoHomePageState extends State<TodoHomePage> {
         home: Scaffold(
           key: _scaffoldKey,
             // bottomSheet: _buildTodoCreatorForm(),
+            drawer: Drawer(
+              child: ListView(
+                children: <Widget>[
+                  DrawerHeader(
+                    child: Text("Menu")
+                  ),
+                  ListTile(
+                    title: Text('View Todos by tag'),
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => TodoByTags()));
+                      // Navigator.pop(context);
+                    },
+                  )
+                ],
+              )
+            ),
             bottomNavigationBar: _buildTodoCreatorForm(),
             appBar: AppBar(
               title: Text('Pratyay\'s Todo list'),
