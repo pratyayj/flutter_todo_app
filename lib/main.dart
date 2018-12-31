@@ -88,10 +88,10 @@ class _TodoHomePageState extends State<TodoHomePage> {
           padding: const EdgeInsets.fromLTRB(32.0, 32.0, 32.0, 0.0),
           itemBuilder: (context, i) {
             return ListTile(
-              title: Text(todoList[i].getTodo(), style: _BIGGER_FONT),
+              title: Text(todoList[i].getTaskName(), style: _BIGGER_FONT),
               trailing: GestureDetector(
                 onTap: () {
-                  String todoName = todoList[i].getTodo();
+                  String todoName = todoList[i].getTaskName();
                   String todoId = todoList[i].getId();
                   String finalDeleteUrl = DELETE_URL + todoId;
                   apiDeleteRequest(finalDeleteUrl, todoName, context);

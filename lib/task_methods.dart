@@ -5,8 +5,7 @@ import 'dart:convert';
 
 Future<List<Todo>> fetchTodos() async {
   final response =
-  await http.get('http://prattodo.us-east-2.elasticbeanstalk.com/api/" +'
-      'displayAllTodo');
+  await http.get('http://prattodo.us-east-2.elasticbeanstalk.com/api/displayAllTodo');
 
   if (response.statusCode == 200) {
     // If the call to the server was successful, parse the JSON
