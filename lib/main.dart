@@ -181,7 +181,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
                   ListTile(
                     title: Text('View Todos by tag'),
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => TodoByTags()));
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => TodosByTags()));
                       // Navigator.pop(context);
                     },
                   )
