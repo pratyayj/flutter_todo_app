@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'task.dart';
+import 'todo.dart';
 import 'api_methods.dart';
-import 'task_methods.dart';
 import 'todos_by_tags.dart';
 
 void main() => runApp(MyApp());
@@ -23,11 +22,6 @@ class MyApp extends StatelessWidget {
 
 class TodoHomePage extends StatefulWidget {
   TodoHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-  // Fields in a Widget subclass are always marked "final".
 
   final String title;
 
@@ -79,70 +73,65 @@ class _TodoHomePageState extends State<TodoHomePage> {
   createTodoListViewWidget(List<Todo> todoList) {
     final _BIGGER_FONT = const TextStyle(fontSize: 18.0);
 
-    Widget _buildTodoList() {
-      return ListView.separated(
-          physics: const ScrollPhysics(),
-          itemCount: todoList == null ? 0 : todoList.length,
-          separatorBuilder: (BuildContext context, int index) => Divider(),
-          shrinkWrap: true,
-          padding: const EdgeInsets.fromLTRB(32.0, 32.0, 32.0, 0.0),
-          itemBuilder: (context, i) {
-            return ListTile(
-              title: Text(todoList[i].getTaskName(), style: _BIGGER_FONT),
-              trailing: GestureDetector(
-                onTap: () {
-                  String todoName = todoList[i].getTaskName();
-                  String todoId = todoList[i].getId();
-                  String finalDeleteUrl = DELETE_URL + todoId;
-                  apiDeleteRequest(finalDeleteUrl, todoName, context);
-                  refreshList();
-                  _refreshIndicatorKey.currentState.show();
-                },
-                child: new Icon(
-                  Icons.delete,
-                  color: Colors.grey,
-                ),
+    return ListView.separated(
+        physics: const ScrollPhysics(),
+        itemCount: todoList == null ? 0 : todoList.length,
+        separatorBuilder: (BuildContext context, int index) => Divider(),
+        shrinkWrap: true,
+        padding: const EdgeInsets.fromLTRB(32.0, 32.0, 32.0, 0.0),
+        itemBuilder: (context, i) {
+          return ListTile(
+            title: Text(todoList[i].getTaskName(), style: _BIGGER_FONT),
+            trailing: GestureDetector(
+              onTap: () {
+                String todoName = todoList[i].getTaskName();
+                String todoId = todoList[i].getId();
+                String finalDeleteUrl = DELETE_URL + todoId;
+                apiDeleteRequest(finalDeleteUrl, todoName, context);
+                refreshList();
+                _refreshIndicatorKey.currentState.show();
+              },
+              child: new Icon(
+                Icons.delete,
+                color: Colors.grey,
               ),
-            );
-          });
-    }
-
-    return _buildTodoList();
+            ),
+          );
+        });
   }
 
   Widget _buildTodoCreatorForm() {
-        return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Flexible(
-                  child: Padding(
-                      padding:
-                      const EdgeInsets.fromLTRB(32.0, 16.0, 0.0, 16.0),
-                      child: TextField(
-                        cursorColor: Colors.green,
-                        controller: myController,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'Please enter a todo task',
-                        ),
-                      ))),
-              Padding(
-                  padding: const EdgeInsets.fromLTRB(0.0, 16.0, 32.0, 16.0),
-                  child: RaisedButton(
-                    child: const Text('Submit'),
-                    color: Colors.red,
-                    highlightColor: Colors.blue,
-                    elevation: 4.0,
-                    onPressed: () {
-                      String taskName = myController.text;
-                      myController.clear();
-                      Map map = {'task': taskName};
-                      // add logging message or display HTTP response
-                      refreshList();
-                      apiCreateRequest(POST_URL, map, _scaffoldKey);
-                      },
-                  ))
-            ]);
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          Flexible(
+              child: Padding(
+                  padding: const EdgeInsets.fromLTRB(32.0, 16.0, 0.0, 16.0),
+                  child: TextField(
+                    cursorColor: Colors.green,
+                    controller: myController,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'Please enter a todo task',
+                    ),
+                  ))),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(0.0, 16.0, 32.0, 16.0),
+              child: RaisedButton(
+                child: const Text('Submit'),
+                color: Colors.red,
+                highlightColor: Colors.blue,
+                elevation: 4.0,
+                onPressed: () {
+                  String taskName = myController.text;
+                  myController.clear();
+                  Map map = {'task': taskName};
+                  // add logging message or display HTTP response
+                  refreshList();
+                  apiCreateRequest(POST_URL, map, _scaffoldKey);
+                },
+              ))
+        ]);
   }
 
   /// This method retrieves all the Todos and
@@ -170,24 +159,22 @@ class _TodoHomePageState extends State<TodoHomePage> {
     return MaterialApp(
         title: 'learning',
         home: Scaffold(
-          key: _scaffoldKey,
+            key: _scaffoldKey,
             // bottomSheet: _buildTodoCreatorForm(),
             drawer: Drawer(
-              child: ListView(
-                children: <Widget>[
-                  DrawerHeader(
-                    child: Text("Menu")
-                  ),
-                  ListTile(
-                    title: Text('View Todos by tag'),
-                    onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => TodosByTags()));
-                      // Navigator.pop(context);
-                    },
-                  )
-                ],
-              )
-            ),
+                child: ListView(
+              children: <Widget>[
+                DrawerHeader(child: Text("Menu")),
+                ListTile(
+                  title: Text('View Todos by tag'),
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => TodosByTags()));
+                    // Navigator.pop(context);
+                  },
+                )
+              ],
+            )),
             bottomNavigationBar: _buildTodoCreatorForm(),
             appBar: AppBar(
               title: Text('Pratyay\'s Todo list'),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
-import 'dart:convert';
 import 'package:logging/logging.dart';
+import 'tag.dart';
+import 'api_methods.dart';
+import 'todo.dart';
 
 class TodosByTags extends StatelessWidget {
   // This widget is the root of your application.
@@ -31,6 +33,7 @@ class _TodosByTagsHomePageState extends State<TodosByTagsHomePage> {
   Tag selectedTag;
 
   Future<List<Tag>> _tagsList;
+  List _todoList = new List<Todo>();
 
   @override
   void initState() {
@@ -48,7 +51,7 @@ class _TodosByTagsHomePageState extends State<TodosByTagsHomePage> {
         ),
         body: ListView(
             children: <Widget>[
-              FutureBuilder<List<Tag>> (
+              FutureBuilder<List<Tag>>(
                   future: _tagsList,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
@@ -65,55 +68,63 @@ class _TodosByTagsHomePageState extends State<TodosByTagsHomePage> {
                           setState(() {
                             log.info("In set state");
                             selectedTag = chosenTag;
-                            Scaffold.of(context).showSnackBar(new SnackBar(content: Text(selectedTag.tagName)));
+                            Scaffold.of(context).showSnackBar(new SnackBar(
+                                content: Text(selectedTag.tagName)));
                           });
                         },
-                      ) ;
+                      );
                     } else if (snapshot.hasError) {
                       return Text("${snapshot.error}");
                     }
 
                     return Container(width: 0.0, height: 0.0);
                   }),
+              createSimpleWidget(),
             ])
     );
   }
 
-  Future<List<Tag>> fetchTags() async {
-    final response =
-    await http.get('http://prattodo.us-east-2.elasticbeanstalk.com/api/displayAllTags');
+  Widget createSimpleWidget() {
+    return (selectedTag == null)
+        ? Container()
+        : retrieveSelectedTodoAndCreateList(selectedTag.tagName);
+  }
 
-    if (response.statusCode == 200) {
-      // If the call to the server was successful, parse the JSON
-      var result = compute(parseData, response.body);
-      return result;
-    } else {
-      // If that call was not successful, throw an error.
-      throw Exception('Failed to load post');
+  FutureBuilder<List<Todo>> retrieveSelectedTodoAndCreateList(String tagName) {
+    return new FutureBuilder<List<Todo>>(
+        future: fetchSelectedTodos(tagName),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            print(snapshot.hasData);
+            _todoList = snapshot.data;
+            return createSelectedTodoListViewWidget(_todoList);
+          } else if (snapshot.hasError) {
+            return Text("${snapshot.error}");
+          }
+
+          return Container(width: 0.0, height: 0.0);
+        });
+  }
+
+  createSelectedTodoListViewWidget(List<Todo> todoList) {
+    final _BIGGER_FONT = const TextStyle(fontSize: 18.0);
+
+    Widget _buildTodoList() {
+      return ListView.separated(
+          physics: const ScrollPhysics(),
+          itemCount: todoList == null ? 0 : todoList.length,
+          separatorBuilder: (BuildContext context, int index) => Divider(),
+          shrinkWrap: true,
+          padding: const EdgeInsets.fromLTRB(32.0, 32.0, 32.0, 0.0),
+          itemBuilder: (context, i) {
+            return ListTile(
+              title: Text(todoList[i].getTaskName(), style: _BIGGER_FONT),
+            );
+          });
     }
+
+    return _buildTodoList();
   }
 
-  static List<Tag> parseData(String response) {
-    final parsed = json.decode(response);
 
-    return (parsed["data"] as List).map<Tag>((json) =>
-    new Tag.fromJson(json)).toList();
-  }
-
-}
-
-class Tag {
-  final String tagName;
-  final String id;
-  final int v;
-
-  Tag({this.id, this.tagName, this.v});
-
-  factory Tag.fromJson(Map<String, dynamic> json) {
-    return new Tag(
-      id: json['_id'],
-      tagName: json['tagName'],
-      v: json['__v'],
-    );
-  }
 }
